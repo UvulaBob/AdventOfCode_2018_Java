@@ -1,0 +1,171 @@
+import Operations.Addr;
+import Operations.*;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+
+public class Part2 {
+    private static HashMap<String, Operation> operations = new HashMap<>();
+    private static ArrayList<String> instructions = new ArrayList<>();
+    private static Long ipRegister;
+
+
+    public static void main(String[] args) {
+        initialize();
+        runOperations();
+//        otherWay();
+
+    }
+
+    private static void otherWay() {
+        ArrayList<Long> bigNumbers = new ArrayList<>();
+        long r1 = 0;
+        long r2 = 0;
+        long r3 = 0;
+        long r5 = 0;
+
+
+        while (true) {
+            // Establish the first loop's target number
+            r3 = r1 | 65536;
+            r1 = 6780005;
+            r2 = r3 & 255;
+            r1 += r2;
+            r1 = r1 & 16777215;
+            r1 *= 65899;
+            r1 = r1 & 16777215;
+            r2 = 0;
+
+            while(true) {
+                r5 = r2 + 1;
+                r5 *= 256;
+                if (r5 > r3) {
+                    r5 = 1;
+                    break;
+                }
+                r2 += 1;
+            }
+            r3 = r2;
+            r2 = r3 & 255;
+            r1 += r2;
+            r1 = r1 & 16777215;
+            r1 *= 65899;
+            r1 = r1 & 16777215;
+            r2 = 0;
+
+            while(true) {
+                r5 = r2 + 1;
+                r5 *= 256;
+                if (r5 > r3) {
+                    r5 = 1;
+                    break;
+                }
+                r2 += 1;
+            }
+
+            r3 = r2;
+            r2 = r3 & 255;
+            r1 += r2;
+            r1 = r1 & 16777215;
+            r1 *= 65899;
+            r1 = r1 & 16777215;
+            r2 = 0;
+            if (bigNumbers.contains(r1)) {
+                System.out.println("Repeat Detected: " + r1);
+            }
+            System.out.println ("Adding " + r1);
+            bigNumbers.add(r1);
+        }
+    }
+
+    private static void runOperations() {
+        int count = 0;
+        Long instructionNumberToExecute = 0L;
+        ArrayList<Long> registers = new ArrayList<>(Arrays.asList(0L, 0L, 0L, 0L, 0L, 0L));
+        while (true) {
+            StringBuilder sb = new StringBuilder();
+            if (instructionNumberToExecute >= instructions.size()) {
+                break;
+            }
+            String instructionToExecute = instructions.get(instructionNumberToExecute.intValue());
+            sb.append(String.format("#%s, %s, %s, ", instructionNumberToExecute, registers, instructionToExecute));
+            String[] splitInstruction = instructionToExecute.split(" ");
+            Operation operation = operations.get(splitInstruction[0]);
+            ArrayList<Long> parameters = new ArrayList<>();
+            parameters.add(0L);
+            parameters.add(Long.parseLong(splitInstruction[1]));
+            parameters.add(Long.parseLong(splitInstruction[2]));
+            parameters.add(Long.parseLong(splitInstruction[3]));
+            registers = operation.compute(registers, parameters);
+            Long nextInstructionNumberToExecute = registers.get(ipRegister.intValue()) + 1;
+            registers.set(ipRegister.intValue(), nextInstructionNumberToExecute);
+            sb.append(String.format("%s", registers));
+            System.out.println(sb);
+            instructionNumberToExecute = nextInstructionNumberToExecute;
+            count++;
+        }
+
+        System.out.println("Done!");
+        System.out.println("Final register values: " + registers.toString());
+    }
+
+    private static void initialize() {
+
+        // The name of the file to open.
+        String fileName = "C:\\workspace\\AoC2018\\Java\\Day21\\src\\main\\resources\\input.txt";
+
+
+        // This will reference one line at a time
+        String line;
+
+        try {
+            // FileReader reads text files in the default encoding.
+            FileReader fileReader =
+                    new FileReader(fileName);
+
+            // Always wrap FileReader in BufferedReader.
+            BufferedReader bufferedReader =
+                    new BufferedReader(fileReader);
+
+            while ((line = bufferedReader.readLine()) != null) {
+                if (line.contains("#")) {
+                    ipRegister = Long.parseLong(line.split("#ip ")[1]);
+                } else {
+                    instructions.add(line);
+                }
+            }
+
+            // Always close files.
+            bufferedReader.close();
+        } catch (FileNotFoundException ex) {
+            System.out.println(
+                    "Unable to open file '" +
+                            fileName + "'");
+        } catch (IOException ex) {
+            System.out.println(
+                    "Error reading file '"
+                            + fileName + "'");
+
+        }
+
+        operations.put("addi", Addi.getInstance());
+        operations.put("addr", Addr.getInstance());
+        operations.put("bani", Bani.getInstance());
+        operations.put("banr", Banr.getInstance());
+        operations.put("bori", Bori.getInstance());
+        operations.put("borr", Borr.getInstance());
+        operations.put("eqir", Eqir.getInstance());
+        operations.put("eqri", Eqri.getInstance());
+        operations.put("eqrr", Eqrr.getInstance());
+        operations.put("gtir", Gtir.getInstance());
+        operations.put("gtri", Gtri.getInstance());
+        operations.put("gtrr", Gtrr.getInstance());
+        operations.put("muli", Muli.getInstance());
+        operations.put("mulr", Mulr.getInstance());
+        operations.put("seti", Seti.getInstance());
+        operations.put("setr", Setr.getInstance());
+    }
+}

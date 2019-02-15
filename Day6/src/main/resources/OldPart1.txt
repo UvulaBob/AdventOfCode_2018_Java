@@ -1,0 +1,83 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+
+public class Part1 {
+
+    public static void main(String[] args) throws IOException {
+        List<String> importantPoints = Files.readAllLines(Paths.get("C:\\workspace\\AoC2018\\Java\\Day6\\src\\main\\resources\\input.txt"));
+        HashMap<String, Integer> numberOfClosestLocations = new HashMap<>();
+
+        int highestX = 0;
+        int highestY = 0;
+        int lowestX = Integer.MAX_VALUE;
+        int lowestY = Integer.MAX_VALUE;
+
+        for (String importantPoint : importantPoints ) {
+            String[] splitPoint = importantPoint.split(", ");
+            int x = Integer.parseInt(splitPoint[0]);
+            int y = Integer.parseInt(splitPoint[1]);
+
+            highestX = (x > highestX) ? x : highestX;
+            highestY = (y > highestY) ? y : highestY;
+            lowestX = (x < lowestX) ? x : lowestX;
+            lowestY = (y < lowestY) ? y : lowestY;
+        }
+
+
+        for (int x = lowestX; x <= highestX; x++) {
+            for (int y = lowestY; y <= highestY; y++) {
+                HashMap<String, Integer> distancesToImportantPoints = new HashMap<>();
+                int smallestDistanceToAnImportantPoint = Integer.MAX_VALUE;
+                String currentPoint = x + ", " + y;
+                for (String importantPoint : importantPoints) {
+                    int distanceToPoint = distanceBetweenPoints(currentPoint, importantPoint);
+                    if (distanceToPoint < smallestDistanceToAnImportantPoint) {
+                        smallestDistanceToAnImportantPoint = distanceToPoint;
+                        distancesToImportantPoints.put(importantPoint, distanceToPoint);
+                    }
+                }
+
+                for (Map.Entry<String, Integer> entry : distancesToImportantPoints.entrySet()) {
+                    int distance = entry.getValue();
+                    if (distance == smallestDistanceToAnImportantPoint) {
+                        String importantPoint = entry.getKey();
+                        numberOfClosestLocations.putIfAbsent(importantPoint, 0);
+                        numberOfClosestLocations.put(importantPoint, numberOfClosestLocations.get(importantPoint) + 1);
+                    }
+                }
+            }
+        }
+
+        int mostNumberOfClosestLocations = 0;
+        String pointWithMostClosestLocations = "";
+        for (Map.Entry<String, Integer> entry : numberOfClosestLocations.entrySet()) {
+            String point = entry.getKey();
+            int x = Integer.parseInt(point.split(", ")[0]);
+            int y = Integer.parseInt(point.split(", ")[1]);
+
+            if (x == lowestX || x == highestX || y == lowestY || y == highestY) {
+                continue;
+            }
+
+            if (entry.getValue() > mostNumberOfClosestLocations) {
+                mostNumberOfClosestLocations = entry.getValue();
+                pointWithMostClosestLocations = point;
+            }
+        }
+
+
+        System.out.println("Done!");
+    }
+
+    private static int distanceBetweenPoints(String a, String b) {
+        int x1 = Integer.parseInt(a.split(", ")[0]);
+        int y1 = Integer.parseInt(a.split(", ")[1]);
+        int x2 = Integer.parseInt(b.split(", ")[0]);
+        int y2 = Integer.parseInt(b.split(", ")[1]);
+        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    }
+
+
+}

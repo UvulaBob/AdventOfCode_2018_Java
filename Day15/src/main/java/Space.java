@@ -1,0 +1,3 @@
+class Space {
+    Occupant occupant;
+}

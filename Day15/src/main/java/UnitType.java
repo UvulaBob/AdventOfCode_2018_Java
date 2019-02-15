@@ -1,0 +1,3 @@
+enum UnitType {
+    ELF, GOBLIN
+}

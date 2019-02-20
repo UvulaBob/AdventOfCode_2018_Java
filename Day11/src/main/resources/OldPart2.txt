@@ -1,0 +1,127 @@
+public class Part2 {
+
+    public static void main(String[] args) {
+        // Given to us by the event description.
+        int gridSerialNumber = 3463;
+
+        int gridSize = 300;
+
+        // The lowest possible power level for a square is -5 * the number of cells in that square. If
+        // highestPowerLevel is initially set to -46, then the very first powerLevel is guaranteed to be higher.
+        int highestPowerLevel = (-5 * gridSize) - 1;
+
+        // This is set to "Nothing" because it needs to be set to something. Otherwise, Java throws an error
+        // when compiling the program before actually running it.
+        String coordinatesWithHighestPowerLevel = "Nothing";
+
+        // The grid is 300 by 300. We don't use 0 for X or Y, though. That means the grid is technically
+        // 301 x 301, with an entire row and column we don't use. Also, since the 3x3 square we're
+        // looking for will never bleed off the edge, our top-left cell of the 3x3 square will
+        // never go past (299,299).
+        for (int x = 1; x <= gridSize; x++) {
+            for (int y = 1; y <= gridSize; y++) {
+                // This will get the total power level for a 3x3 square with a top-left coordinate of (x,y).
+                int maximumBoxSize = calculateMaximumBoxSize(x, y, gridSize);
+                int highestSquarePowerLevel = -6;
+                int squareSizeWithHighestPowerLevel = 0;
+                int currentSquarePowerLevel = 0;
+                System.out.println("Calculating power levels for all possible squares in " + x + "," + y);
+                for (int size = 1; size <= maximumBoxSize; size++) {
+                    currentSquarePowerLevel += calculatePowerLevelForBordersOfSquare(x, y, gridSerialNumber, size);
+                    if (currentSquarePowerLevel > highestSquarePowerLevel) {
+                        highestSquarePowerLevel = currentSquarePowerLevel;
+                        squareSizeWithHighestPowerLevel = size;
+                    }
+                }
+                if (highestSquarePowerLevel > highestPowerLevel) {
+                    highestPowerLevel = highestSquarePowerLevel;
+                    coordinatesWithHighestPowerLevel = x + "," + y + "," + squareSizeWithHighestPowerLevel;
+                }
+            }
+        }
+
+        System.out.println("Done!");
+        System.out.println("Coordinates with highest power level: " + coordinatesWithHighestPowerLevel);
+        System.out.println("Power level: " + highestPowerLevel);
+
+    }
+
+    private static int calculateMaximumBoxSize(int x, int y, int gridSize) {
+        int distanceToXBorder = gridSize - x;
+        int distanceToYBorder = gridSize - y;
+        if (distanceToXBorder < distanceToYBorder) {
+            return distanceToXBorder + 1;
+        } else {
+            return distanceToYBorder + 1;
+        }
+    }
+
+    private static int calculatePowerLevelFor3x3Square(int x, int y, int gridSerialNumber) {
+
+        int totalPowerLevel = 0;
+        // We're going to be incrementing both X and Y by three, to make our 3x3 square.
+        int upperX = x + 3;
+        int upperY = y + 3;
+
+        // Every time we increment X, we need to remember what Y was, so we'll store it here.
+        int originalY = y;
+
+        while (x < upperX) {
+            while (y < upperY) {
+                // Calculate the power level of the cell at (x,y) and add it to the total for
+                // the 3x3 square we're calculating for.
+                int cellPowerLevel = calculatePowerLevelForSingleCell(x, y, gridSerialNumber);
+                totalPowerLevel += cellPowerLevel;
+                y++;
+            }
+            y = originalY;
+            x++;
+        }
+        return totalPowerLevel;
+    }
+
+
+    private static int calculatePowerLevelForBordersOfSquare(int x, int y, int gridSerialNumber, int size) {
+
+        int totalPowerLevel = 0;
+        // We're going to be incrementing both X and Y by three, to make our 3x3 square.
+        int upperX = (x + size) - 1;
+        int upperY = (y + size) - 1;
+
+        while (x <= upperX) {
+            int cellPowerLevel = calculatePowerLevelForSingleCell(x, upperY, gridSerialNumber);
+            totalPowerLevel += cellPowerLevel;
+            x++;
+        }
+
+        while (y <= (upperY - 1)) {
+            int cellPowerLevel = calculatePowerLevelForSingleCell(upperX, y, gridSerialNumber);
+            totalPowerLevel += cellPowerLevel;
+            y++;
+        }
+
+        return totalPowerLevel;
+    }
+
+    private static int calculatePowerLevelForSingleCell(int x, int y, int gridSerialNumber) {
+        // This is the formula given to us by the event description.
+        int rackId = x + 10;
+        int powerLevel = ((rackId * y) + gridSerialNumber) * rackId;
+        // We set hundredsDigit to 0 to start. If the powerLevel we're supposed to pluck the hundreds
+        // digit from is larger than 99, then we'll end up updating hundredsDigit with the actual number.
+        int hundredsDigit = 0;
+        if (powerLevel > 99) {
+            // StringBuilder is a pretty cool class. It lets us do cool things like turn "123" into "321".
+            StringBuilder sb = new StringBuilder(Integer.toString(powerLevel));
+            sb.reverse();
+            // Now, we take the flipped powerLevel value, start at position 2, move one position to 3,
+            // extract that character, and put it into hundredsDigitCharacter.
+            String hundredsDigitCharacter = sb.toString().substring(2, 3);
+            // Then we use the parseInt() method to turn it back into a digit. There's probably a better
+            // way to extract a digit from an integer, but I'm fine with this.
+            hundredsDigit = Integer.parseInt(hundredsDigitCharacter);
+        }
+        return hundredsDigit - 5;
+    }
+
+}

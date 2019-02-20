@@ -1,0 +1,60 @@
+public class Part1 {
+    private static final int gridSerialNumber = 3463;
+
+    public static void main(String[] args) {
+        int gridSize = 300;
+        int blockSize = 3;
+
+        int highestBlockPowerLevel = (-5 * blockSize);
+        String coordinatesWithHighestPowerLevel = "0,0";
+
+        for (int x = 0; x < gridSize; x++) {
+            for (int y = 0; y < gridSize; y++) {
+                int currentBlockPowerLevel = calculatePowerLevelForBlock(x, y, blockSize);
+                if (currentBlockPowerLevel > highestBlockPowerLevel) {
+                    highestBlockPowerLevel = currentBlockPowerLevel;
+                    coordinatesWithHighestPowerLevel = x + "," + y;
+                }
+            }
+        }
+
+        System.out.println("Done!");
+        System.out.println("Coordinates with highest power level: " + coordinatesWithHighestPowerLevel);
+
+    }
+
+    private static int calculatePowerLevelForBlock(int x, int y, int blockSize) {
+
+        int blockPowerLevel = 0;
+        int upperX = x + blockSize;
+        int upperY = y + blockSize;
+
+        int originalY = y;
+
+        while (x < upperX) {
+            while (y < upperY) {
+                int cellPowerLevel = calculatePowerLevelForSingleCell(x, y);
+                blockPowerLevel += cellPowerLevel;
+                y++;
+            }
+            y = originalY;
+            x++;
+        }
+        return blockPowerLevel;
+    }
+
+    private static int calculatePowerLevelForSingleCell(int x, int y) {
+        int rackId = x + 10;
+        int powerLevel = ((rackId * y) + gridSerialNumber) * rackId;
+
+        int hundredsDigit = 0;
+        if (powerLevel > 99) {
+            StringBuilder sb = new StringBuilder(Integer.toString(powerLevel));
+            sb.reverse();
+            String hundredsDigitCharacter = sb.toString().substring(2, 3);
+            hundredsDigit = Integer.parseInt(hundredsDigitCharacter);
+        }
+        return hundredsDigit - 5;
+    }
+
+}

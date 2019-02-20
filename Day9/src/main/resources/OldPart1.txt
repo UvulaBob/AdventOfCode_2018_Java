@@ -1,0 +1,76 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class Part1 {
+
+    public static void main(String[] args) {
+
+        int numberOfPlayers = 477;
+        int numberOfMarbles = 70851;
+        HashMap<Integer, Integer> playersAndPoints = new HashMap<>(numberOfPlayers);
+
+        for (int i = 1; i <= numberOfPlayers; i++) {
+            playersAndPoints.put(i, 0);
+        }
+
+
+        ArrayList<Integer> marbleCircle = new ArrayList<>(numberOfMarbles);
+
+        // The setup and first three turns are always the same, and coding for them sucks, so here they are.
+        marbleCircle.add(0);
+        marbleCircle.add(1);
+        marbleCircle.add(1, 2);
+        marbleCircle.add(3);
+
+        int currentMarblePosition = 3;
+        int marbleNumberBeingPlaced = 4;
+        int currentPlayer = 4;
+
+        while (marbleNumberBeingPlaced <= numberOfMarbles) {
+            int targetMarblePosition;
+
+            if (marbleNumberBeingPlaced % 23 == 0 ) {
+                targetMarblePosition = currentMarblePosition - 7;
+                while (targetMarblePosition < 0) {
+                    targetMarblePosition += marbleCircle.size();
+                }
+                int valueOfTargetMarble = marbleCircle.get(targetMarblePosition);
+                System.out.println("Taking marbles " + marbleNumberBeingPlaced + " and " + valueOfTargetMarble);
+                int playerPoints = playersAndPoints.get(currentPlayer) + marbleNumberBeingPlaced + valueOfTargetMarble;
+                playersAndPoints.put(currentPlayer, playerPoints);
+                System.out.println("Scoring " + playerPoints + " points");
+                marbleCircle.remove(targetMarblePosition);
+            } else {
+//                System.out.println("Placing marble " + marbleNumberBeingPlaced);
+                targetMarblePosition = currentMarblePosition + 2;
+                if (targetMarblePosition > marbleCircle.size()) {
+                    targetMarblePosition -= marbleCircle.size();
+                }
+
+                if (targetMarblePosition == marbleCircle.size()){
+                    marbleCircle.add(marbleNumberBeingPlaced);
+                } else {
+                    marbleCircle.add(targetMarblePosition, marbleNumberBeingPlaced);
+                }
+            }
+
+            currentMarblePosition = targetMarblePosition;
+            marbleNumberBeingPlaced++;
+            currentPlayer++;
+            while (currentPlayer > numberOfPlayers) {
+                currentPlayer -= numberOfPlayers;
+            }
+//            System.out.println(marbleCircle);
+        }
+
+        int highScore = 0;
+        for (int score : playersAndPoints.values()) {
+            if (score > highScore) {
+                highScore = score;
+            }
+        }
+
+        System.out.println("High score: " + highScore);
+        System.out.println("Done!");
+    }
+}

@@ -6,7 +6,7 @@ import java.util.*;
 public class Part1 {
 
     public static void main(String[] args) throws IOException{
-        List<String> lines = Files.readAllLines(Paths.get("C:\\workspace\\AoC2018\\Java\\Day13\\src\\main\\resources\\input.txt"));
+        List<String> lines = Files.readAllLines(Paths.get(new File("").getAbsolutePath() + "\\src\\input.txt"));
         HashMap<String, String> grid = new HashMap<>();
 
         int y = 0;

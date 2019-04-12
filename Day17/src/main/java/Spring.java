@@ -1,2 +1,0 @@
-class Spring extends Water {
-}

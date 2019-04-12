@@ -1,2 +1,0 @@
-class SettledWater extends Water {
-}

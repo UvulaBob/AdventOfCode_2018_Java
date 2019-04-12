@@ -8,7 +8,7 @@ public class Part2 {
     private static HashMap<String, String> transitionConditions = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
-        List<String> lines = Files.readAllLines(Paths.get("C:\\workspace\\AoC2018\\Java\\Day12\\src\\main\\resources\\input.txt"));
+        List<String> lines = Files.readAllLines(Paths.get(new File("").getAbsolutePath() + "\\src\\input.txt"));
         long maxGeneration = 50000000000L;
 
         String currentState = lines.get(0).replace("initial state: ", "");
